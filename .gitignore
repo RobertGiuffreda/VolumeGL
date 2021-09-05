@@ -8,3 +8,6 @@ thirdparty/glfw/docs/
 *.vcxproj.user
 
 .vs/
+
+x64/
+Volume/x64/
