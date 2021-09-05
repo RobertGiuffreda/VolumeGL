@@ -1,5 +1,7 @@
 Other/
 
+thirdparty/glfw/docs/
+
 *.sln
 *.vcxproj
 *.vcxproj.filters
