@@ -1,0 +1,25 @@
+Tendril Ball
+XDIM, YDIM, ZDIM = 64;
+
+PNUM = 100000
+
+move_dist = 1.0f;
+sensor_dist = 5.0f;
+sample_num = 20.0;
+turn_speed = 1.0f
+
+decay = 0.001f;
+blur_factor = 0.2f;
+
+Exploding Ball
+XDIM, YDIM, ZDIM = 64;
+
+PNUM = 100000
+
+move_dist = 4.0f;
+sensor_dist = 10.0f;
+sample_num = 20.0;
+turn_speed = 1.0f;
+
+decay = 0.01f;
+blur_factor = 0.2f;
