@@ -31,14 +31,14 @@ const int XDIM = 64;
 const int YDIM = 64;
 const int ZDIM = 64;
 
-const int PNUM = 100000;
+const int PNUM = 200000;
 
 const float move_dist = 1.0f;
 const float sensor_dist = 5.0f;
 const int sample_num = 20.0;
 const float turn_speed = 0.5f;
 
-const float decay = 0.4f;
+const float decay = 0.1f;
 const float blur_factor = 1.0f;
 
 unsigned int textureID;
@@ -162,16 +162,16 @@ int main(void)
 	for (int i = 0; i < PNUM; i++)
 	{
 		/* Particle Position */
-		//glm::vec3 pos = glm::normalize(glm::vec3(standardNormal(), standardNormal(), standardNormal()));
-		//pos *= glm::pow(uniform(), (1.0f / 3.0f)) * (XDIM/2);
-		//particles[i].pos = glm::vec4(pos, 1.0f) + glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f;
+		glm::vec3 pos = glm::normalize(glm::vec3(standardNormal(), standardNormal(), standardNormal()));
+		pos *= glm::pow(uniform(), (1.0f / 3.0f)) * (XDIM/2) * 0.5f;
+		particles[i].pos = glm::vec4(pos, 1.0f) + glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f;
 		//particles[i].pos = glm::vec4(uniform() * XDIM, uniform() * YDIM, uniform() * ZDIM, 1.0f);
-		particles[i].pos = glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f;
+		//particles[i].pos = glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f;
 
 		/* Particle Direction */
-		particles[i].dir = glm::vec4(glm::normalize(glm::vec3(standardNormal(), standardNormal(), standardNormal())), 1.0f);	// Random direction
+		//particles[i].dir = glm::vec4(glm::normalize(glm::vec3(standardNormal(), standardNormal(), standardNormal())), 1.0f);	// Random direction
 		//particles[i].dir = glm::normalize(glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f - particles[i].pos);
-		//particles[i].dir = glm::normalize(particles[i].pos - glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f);
+		particles[i].dir = glm::normalize(particles[i].pos - glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f);
 
 		/* Particle Color */
 		//particles[i].col = glm::vec4(particles[i].pos.x/XDIM, particles[i].pos.x / XDIM, 1.0f, 1.0f);
