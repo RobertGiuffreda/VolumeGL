@@ -20,8 +20,8 @@ void process_input(GLFWwindow* window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
-const unsigned int SCR_WIDTH = 720;
-const unsigned int SCR_HEIGHT = 720;
+const unsigned int SCR_WIDTH = 1020;
+const unsigned int SCR_HEIGHT = 1020;
 
 const unsigned int NOISE_W = 1024;
 const unsigned int NOISE_H = 1024;
@@ -38,7 +38,7 @@ const float sensor_dist = 5.0f;
 const int sample_num = 20.0;
 const float turn_speed = 0.5f;
 
-const float decay = 0.1f;
+const float decay = 0.5f;
 const float blur_factor = 1.0f;
 
 unsigned int textureID;
@@ -169,13 +169,13 @@ int main(void)
 		//particles[i].pos = glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f;
 
 		/* Particle Direction */
-		//particles[i].dir = glm::vec4(glm::normalize(glm::vec3(standardNormal(), standardNormal(), standardNormal())), 1.0f);	// Random direction
+		particles[i].dir = glm::vec4(glm::normalize(glm::vec3(standardNormal(), standardNormal(), standardNormal())), 1.0f);	// Random direction
 		//particles[i].dir = glm::normalize(glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f - particles[i].pos);
-		particles[i].dir = glm::normalize(particles[i].pos - glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f);
+		//particles[i].dir = glm::normalize(particles[i].pos - glm::vec4(XDIM, YDIM, ZDIM, 0.0f) * 0.5f);
 
 		/* Particle Color */
 		//particles[i].col = glm::vec4(particles[i].pos.x/XDIM, particles[i].pos.x / XDIM, 1.0f, 1.0f);
-		particles[i].col = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		particles[i].col = glm::vec4((float)i / PNUM, (float)i / PNUM, 1.0f, 1.0f);
 	}
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
@@ -288,7 +288,7 @@ int main(void)
 		update.SetUniformVec3("dim", glm::vec3(XDIM, YDIM, ZDIM));
 		update.SetUniform1f("time", glfwGetTime());
 		//update.SetUniform1f("delta_time", deltaTime);
-		update.SetUniform1f("delta_time", 1.0f);
+		update.SetUniform1f("delta_time", 0.7f);
 		update.SetUniform1f("turn_speed", turn_speed);
 		update.SetUniform1i("sample_num", sample_num);
 		update.SetUniform1f("sensor_dist", sensor_dist);

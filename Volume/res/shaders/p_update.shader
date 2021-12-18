@@ -154,6 +154,7 @@ void main()
 		n_pos = bound + normalize(n_pos - bound) * bound.x;
 		p[gid].dir.xyz = normalize(hash31(rr) - 0.5);
 	}
+
 	p[gid].pos.xyz = n_pos;
 
 	ivec3 px = ivec3(p[gid].pos.xyz);
