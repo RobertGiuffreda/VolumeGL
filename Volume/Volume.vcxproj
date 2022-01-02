@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -149,14 +149,20 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ComputeShader.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Particles.cpp" />
     <ClCompile Include="src\Random.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\ComputeShader.h" />
+    <ClInclude Include="src\Particles.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\blur_trail.shader" />

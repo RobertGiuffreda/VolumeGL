@@ -24,7 +24,7 @@ void main()
 	}
 	sum *= 1.0f / (1. + 26. * blur_factor);
 
-	sum = mix(imageLoad(trail_map, px_coord), sum, blur_factor * delta_time);
+	sum = mix(imageLoad(trail_map, px_coord), sum, delta_time);
 	sum = mix(sum, sum * decay_rate, delta_time);
 	if (sum.w < eps) sum = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 	imageStore(blur_map, px_coord, sum);

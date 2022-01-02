@@ -1,0 +1,155 @@
+#include <iostream>
+#include "Window.h"
+
+Window::Window(int height, int width) : firstMouse(true), changed(true), px(0), py(0),
+										dx(0), dy(0), delta_time(0), last_frame(0)
+{
+	if (!glfwInit())
+	{
+		std::cout << "GLFW initialization failed!" << std::endl;
+		exit(1);
+	}
+
+	handle = glfwCreateWindow(width, height, "Particle Viewer", nullptr, nullptr);
+	if (!handle)
+	{
+		std::cout << "Particle viewer context creation failed." << std::endl;
+		glfwTerminate();
+		exit(1);
+	}
+
+	glfwMakeContextCurrent(handle);
+
+	glfwSetWindowUserPointer(handle, this);
+
+	auto size_call = [](GLFWwindow* w, int width, int height)
+	{
+		static_cast<Window*>(glfwGetWindowUserPointer(w))->size_callback(w, width, height);
+	};
+	auto mouse_call = [](GLFWwindow* w, double x, double y)
+	{
+		static_cast<Window*>(glfwGetWindowUserPointer(w))->mouse_callback(w, x, y);
+	};
+
+	glfwSetFramebufferSizeCallback(handle, size_call);
+	glfwSetCursorPosCallback(handle, mouse_call);
+	/* Capture the mouse in the OpenGL window */
+	glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	{
+		std::cout << "Failed to initialize OpenGL context" << std::endl;
+		glfwTerminate();
+		exit(1);
+	}
+	glfwSwapInterval(1);
+
+	cam = Camera(glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	perspective = glm::perspective(45.0f, (float)width / height, 0.1f, 1000.0f);
+}
+
+void Window::processMouseMovement()
+{
+	cam.ProcessMouseMovement(dx, dy);
+	dx = dy = 0.0f;
+}
+
+void Window::processKeyboard(Camera_Movement direction)
+{
+	cam.ProcessKeyboard(direction, delta_time);
+}
+
+glm::mat4 Window::getViewMatrix()
+{
+	return cam.GetViewMatrix();
+}
+
+glm::mat4 Window::getPerspectiveMatrix()
+{
+	return perspective;
+}
+
+glm::vec3 Window::getCamPosition()
+{
+	return cam.pos;
+}
+
+void Window::setCamPosition(glm::vec3 position)
+{
+	cam.pos = position;
+}
+
+float Window::getDeltaTime()
+{
+	return delta_time;
+}
+
+glm::mat4 Window::calcMVP()
+{
+	return getPerspectiveMatrix() * getViewMatrix();
+}
+
+void Window::start()
+{
+	float curr_frame = (float)glfwGetTime();
+	delta_time = curr_frame - last_frame;
+	last_frame = curr_frame;
+
+	process_input();
+
+	if (changed) {
+		processMouseMovement();
+		changed = false;
+	}
+}
+
+void Window::end()
+{
+	glfwSwapBuffers(handle);
+	glfwPollEvents();
+}
+
+int Window::windowShouldClose()
+{
+	return glfwWindowShouldClose(handle);
+}
+
+void Window::process_input()
+{
+	if (glfwGetKey(handle, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(handle, true);
+	if (glfwGetKey(handle, GLFW_KEY_W) == GLFW_PRESS)
+		processKeyboard(Camera_Movement::FORWARD);
+	if (glfwGetKey(handle, GLFW_KEY_S) == GLFW_PRESS)
+		processKeyboard(Camera_Movement::BACKWARD);
+	if (glfwGetKey(handle, GLFW_KEY_A) == GLFW_PRESS)
+		processKeyboard(Camera_Movement::LEFT);
+	if (glfwGetKey(handle, GLFW_KEY_D) == GLFW_PRESS)
+		processKeyboard(Camera_Movement::RIGHT);
+}
+
+void Window::mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (firstMouse)
+	{
+		px = xpos;
+		py = ypos;
+		firstMouse = false;
+	}
+
+	dx = xpos - px;
+	dy = py - ypos; // reversed since y-coordinates go from bottom to top
+
+	if (!changed)
+	{
+		px = xpos;
+		py = ypos;
+		changed = true;
+	}
+}
+
+void Window::size_callback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+	perspective = glm::perspective(45.0f, (float)width / height, 0.1f, 1000.0f);
+}
