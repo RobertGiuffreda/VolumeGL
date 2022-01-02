@@ -47,19 +47,6 @@ unsigned int tex1ID;
 unsigned int tex2ID;
 unsigned int ssbo;
 
-/* TO BE REFACTORED OUT */
-Camera cam(glm::vec3(0.0f, 0.0f, -2.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-
-glm::mat4 P = glm::perspective(45.0f, (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 1000.0f);
-
-bool firstMouse = true;
-float lastX = SCR_WIDTH / 2;
-float lastY = SCR_HEIGHT / 2;
-/* TO BE REFACTORED OUT */
-
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-
 int main(void)
 {
 	Window window(SCR_HEIGHT, SCR_WIDTH);
