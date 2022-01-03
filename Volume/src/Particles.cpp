@@ -19,8 +19,12 @@ Particles::Particles(glm::vec3 dim, size_t p_num, Layout distribution, Direction
 			break;
 		case Layout::SPHERE:
 			pos = glm::normalize(glm::vec3(standardNormal(), standardNormal(), standardNormal()));
-			pos *= glm::pow(uniform(), (1.0f / 3.0f)) * (dim.x / 2) * 0.5f;
+			pos *= glm::pow(uniform(), (1.0f / 3.0f)) * (dim.x / 2);
 			particles[i].position = glm::vec4(pos, 1.0f) + center;
+			break;
+		case Layout::CUBE:
+			pos = glm::vec3(uniform(), uniform(), uniform()) * dim;
+			particles[i].position = glm::vec4(pos, 1.0f);
 			break;
 		}
 
@@ -39,7 +43,7 @@ Particles::Particles(glm::vec3 dim, size_t p_num, Layout distribution, Direction
 		}
 
 		/* Particle Color */
-		particles[i].color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		particles[i].color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 }
 

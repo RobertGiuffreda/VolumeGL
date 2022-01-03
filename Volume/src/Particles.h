@@ -14,7 +14,8 @@ enum class Layout
 {
 	CENTER,
 	SHELL,
-	SPHERE
+	SPHERE,
+	CUBE
 };
 
 enum class Direction
