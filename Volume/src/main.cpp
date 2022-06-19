@@ -12,11 +12,11 @@
 #include "Particles.h"
 #include "Simulation.h"
 
-const unsigned int SCR_WIDTH = 1024;
-const unsigned int SCR_HEIGHT = 1024;
+const unsigned int SCR_WIDTH = 1000;
+const unsigned int SCR_HEIGHT = 500;
 
-const unsigned int NOISE_W = 1024;
-const unsigned int NOISE_H = 1024;
+const unsigned int NOISE_W = 1080;
+const unsigned int NOISE_H = 1080;
 
 //volume dimensions
 const int XDIM = 64;

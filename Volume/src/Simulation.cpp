@@ -37,7 +37,7 @@ void Simulation::run()
 		process_compute.SetUniform1f("decay_rate", settings.decay);
 		process_compute.SetUniform1f("blur_factor", settings.blur);
 		process_compute.SetUniform1f("delta_time", window.getDeltaTime());
-		//blur.SetUniform1f("delta_time", 0.7f);
+		//process_compute.SetUniform1f("delta_time", 0.7f);
 		process_compute.SetUniformVec3("dim", settings.dimensions);
 		glDispatchCompute(settings.dimensions.x, settings.dimensions.y, settings.dimensions.z);
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
@@ -49,8 +49,8 @@ void Simulation::run()
 		particle_compute.Bind();
 		particle_compute.SetUniformVec3("dim", settings.dimensions);
 		particle_compute.SetUniform1f("time", glfwGetTime());
-		particle_compute.SetUniform1f("delta_time", window.getDeltaTime());
-		//particle_compute.SetUniform1f("delta_time", 0.7f);
+		//particle_compute.SetUniform1f("delta_time", window.getDeltaTime());
+		particle_compute.SetUniform1f("delta_time", 0.9f);
 		particle_compute.SetUniform1f("turn_speed", settings.turn_speed);
 		particle_compute.SetUniform1i("sample_num", settings.sample_num);
 		particle_compute.SetUniform1f("sensor_dist", settings.sensor_distance);

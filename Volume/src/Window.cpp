@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Window.h"
 
-Window::Window(int height, int width) : firstMouse(true), changed(true), px(0), py(0),
+Window::Window(int width, int height) : firstMouse(true), changed(true), px(0), py(0),
 										dx(0), dy(0), delta_time(0), last_frame(0)
 {
 	if (!glfwInit())
