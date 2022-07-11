@@ -1,4 +1,7 @@
 #pragma once
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -12,29 +15,28 @@
 class Window {
 public:
 	Window(int height, int width);
+	~Window();
 
-	void processMouseMovement();
-	void processKeyboard(Camera_Movement direction);
-	glm::mat4 getViewMatrix();
-	glm::mat4 getPerspectiveMatrix();
+	GLFWwindow* getWindowHandle();
 	glm::vec3 getCamPosition();
-	void setCamPosition(glm::vec3 position); // Used??
 	float getDeltaTime();
 	glm::mat4 calcMVP();
 
-	void process_input();
+	int windowShouldClose();
 	void start();
 	void end();
-	int windowShouldClose();
 
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 	void size_callback(GLFWwindow* window, int width, int height);
+
 private:
 	GLFWwindow* handle;
 	Camera cam;
 
-	bool firstMouse;
+	bool enter;
 	bool changed;
+	bool cursor;
+
 	float px, py;
 	float dx, dy;
 
@@ -42,4 +44,8 @@ private:
 	float delta_time;
 
 	glm::mat4 perspective;
+
+	void toggleCursor();
+	void process_input();
+	void processKeyboard(Camera_Movement direction);
 };

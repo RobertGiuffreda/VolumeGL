@@ -11,7 +11,8 @@ Simulation::Simulation(Simulation_Settings s) :
 	process_compute("res/shaders/blur_trail.shader"),
 	copy_compute("res/shaders/copy.shader"),
 	zero_compute("res/shaders/whiteblock.shader"),
-	particle_shader("res/shaders/particle.vert", "res/shaders/particle.frag")
+	particle_shader("res/shaders/particle.vert", "res/shaders/particle.frag"),
+	dt(true)
 {
 	glGenBuffers(1, &ssbo_id);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_id);
@@ -20,11 +21,22 @@ Simulation::Simulation(Simulation_Settings s) :
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	settings = s;
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	io = &ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplGlfw_InitForOpenGL(window.getWindowHandle(), true);
+	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 Simulation::~Simulation()
 {
 	glDeleteBuffers(1, &ssbo_id);
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void Simulation::run()
@@ -33,9 +45,14 @@ void Simulation::run()
 	{
 		window.start();
 
+		// ImGui New Frame and creation of such
+ 		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
 		process_compute.Bind();
-		process_compute.SetUniform1f("decay_rate", settings.decay);
-		process_compute.SetUniform1f("blur_factor", settings.blur);
+		process_compute.SetUniform1f("decay", settings.decay);
+		process_compute.SetUniform1f("blur", settings.blur);
 		process_compute.SetUniform1f("delta_time", window.getDeltaTime());
 		//process_compute.SetUniform1f("delta_time", 0.7f);
 		process_compute.SetUniformVec3("dim", settings.dimensions);
@@ -49,8 +66,7 @@ void Simulation::run()
 		particle_compute.Bind();
 		particle_compute.SetUniformVec3("dim", settings.dimensions);
 		particle_compute.SetUniform1f("time", glfwGetTime());
-		//particle_compute.SetUniform1f("delta_time", window.getDeltaTime());
-		particle_compute.SetUniform1f("delta_time", 0.9f);
+		particle_compute.SetUniform1f("delta_time", (dt) ? window.getDeltaTime() : 0.9f);
 		particle_compute.SetUniform1f("turn_speed", settings.turn_speed);
 		particle_compute.SetUniform1i("sample_num", settings.sample_num);
 		particle_compute.SetUniform1f("sensor_dist", settings.sensor_distance);
@@ -72,6 +88,20 @@ void Simulation::run()
 		particle_shader.SetUniformMat4("MVP", MVP);
 		particle_shader.SetUniformVec3("dim", settings.dimensions);
 		glDrawArrays(GL_POINTS, 0, settings.pnum);
+
+		// ImGui
+		ImGui::Begin("Hello.");
+		ImGui::Text("Banano is it. It's nice to meet a man such as yourself!");
+		ImGui::SliderFloat("Speed", &(settings.move_distance), 0.0f, 5.0f);
+		ImGui::SliderFloat("Sensor Range", &(settings.sensor_distance), 3.0f, 10.0f);
+		ImGui::Checkbox("Delta Time", &dt);
+		ImGui::SliderFloat("Turn Speed", &(settings.turn_speed), 0.0f, 2.0f);
+		ImGui::SliderFloat("Decay", &(settings.decay), 0.0f, 1.0f);
+		ImGui::SliderFloat("Blur", &(settings.blur), 0.0f, 1.0f);
+		ImGui::End();
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		window.end();
 	}

@@ -39,8 +39,12 @@ public:
 	void ProcessMouseMovement(float xoff, float yoff);
 	void ProcessScroll(float offset);
 
+	void Enable();
+	void Disable();
+
 	glm::mat4 GetViewMatrix();
 	glm::mat3 MarchViewMatrix();
 private:
+	bool enabled;
 	void UpdateCameraVectors();
 };

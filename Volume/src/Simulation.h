@@ -1,11 +1,14 @@
 #pragma once
-#include <glm.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
+#include <glm.hpp>
+#include "Window.h"
 #include "ComputeShader.h"
 #include "Texture.h"
 #include "Marcher.h"
 #include "FullScreenTexture.h"
-#include "Window.h"
 #include "Particles.h"
 #include "Shader.h"
 
@@ -30,6 +33,8 @@ class Simulation {
 public:
 	Window window;
 
+	ImGuiIO *io;
+
 	Particles particles;
 
 	Texture initial_texture;
@@ -52,4 +57,5 @@ public:
 private:
 	unsigned int ssbo_id;
 	Simulation_Settings settings;
+	bool dt;
 };

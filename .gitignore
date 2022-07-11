@@ -2,6 +2,12 @@ Other/
 
 thirdparty/glfw/docs/
 
+Volume/res/shaders/particles.shader
+
+Volume/imgui.ini
+
+TODO.txt
+
 #*.sln
 #*.vcxproj
 #*.vcxproj.filters

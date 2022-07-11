@@ -3,7 +3,7 @@
 #include "gtc/matrix_transform.hpp"
 
 Camera::Camera(glm::vec3 position, glm::vec3 gaze, glm::vec3 wup, float yaw, float pitch)
-	: pos(position), gaze(gaze), yaw(yaw), pitch(pitch),
+	: pos(position), gaze(gaze), yaw(yaw), pitch(pitch), enabled(true),
 	MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
 {
 	worldUp = wup;
@@ -20,34 +20,37 @@ Camera::Camera(float xpos, float ypos, float zpos, float xup, float yup, float z
 
 void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
 {
-
-	switch (direction)
-	{
-	case Camera_Movement::FORWARD:
-		pos += gaze * MovementSpeed * deltaTime;
-		break;
-	case Camera_Movement::BACKWARD:
-		pos -= gaze * MovementSpeed * deltaTime;
-		break;
-	case Camera_Movement::LEFT:
-		pos -= right * MovementSpeed * deltaTime;
-		break;
-	case Camera_Movement::RIGHT:
-		pos += right * MovementSpeed * deltaTime;
-		break;
+	if (enabled) {
+		switch (direction)
+		{
+		case Camera_Movement::FORWARD:
+			pos += gaze * MovementSpeed * deltaTime;
+			break;
+		case Camera_Movement::BACKWARD:
+			pos -= gaze * MovementSpeed * deltaTime;
+			break;
+		case Camera_Movement::LEFT:
+			pos -= right * MovementSpeed * deltaTime;
+			break;
+		case Camera_Movement::RIGHT:
+			pos += right * MovementSpeed * deltaTime;
+			break;
+		}
 	}
 }
 
 void Camera::ProcessMouseMovement(float xoff, float yoff)
 {
-	yaw += xoff * MouseSensitivity;
-	pitch += yoff * MouseSensitivity;
+	if (enabled) {
+		yaw += xoff * MouseSensitivity;
+		pitch += yoff * MouseSensitivity;
 
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-	UpdateCameraVectors();
+		if (pitch > 89.0f)
+			pitch = 89.0f;
+		if (pitch < -89.0f)
+			pitch = -89.0f;
+		UpdateCameraVectors();
+	}
 }
 
 void Camera::ProcessScroll(float offset)
@@ -66,6 +69,10 @@ glm::mat3 Camera::MarchViewMatrix()
 {
 	return glm::mat3(right, up, gaze);
 }
+
+void Camera::Enable() { enabled = true; }
+
+void Camera::Disable() { enabled = false; }
 
 void Camera::UpdateCameraVectors()
 {

@@ -4,8 +4,8 @@ layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 layout(rgba32f, binding = 1) uniform image3D trail_map;
 layout(rgba32f, binding = 2) uniform image3D blur_map;
 
-uniform float decay_rate;
-uniform float blur_factor;
+uniform float decay;
+uniform float blur;
 uniform float delta_time;
 uniform vec3 dim;
 
@@ -19,13 +19,13 @@ void main()
 	//for (int xo = -1; xo < 1; xo++) {
 	//	for (int yo = -1; yo < 1; yo++) {
 	//		for (int zo = -1; zo < 1; zo++) {
-	//			ivec3 tmp_coord = ivec3(px.x + xo, px.y + yo, px.z + zo);
-	//			sum += imageLoad(trail_map, tmp_coord) * blur_factor;
+	//			ivec3 tmp_coord = px + ivec3(xo, yo, zo);
+	//			sum += imageLoad(trail_map, tmp_coord) * blur;
 	//		}
 	//	}
 	//}
 	//
-	//sum *= 1.0f / (1. + 26. * blur_factor);
+	//sum *= 1.0f / (1. + 26. * blur);
 
 	/* 3D Gaussian Kernel */
 	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), max(0, px.y - 1), max(0, px.z - 1)));
@@ -60,10 +60,10 @@ void main()
 
 	sum /= 64.0f;
 
-	float blur_weight = blur_factor * delta_time;
+	float blur_weight = blur * delta_time;
 	sum = mix(imageLoad(trail_map, px), sum, blur_weight);
 
-	sum -= decay_rate * delta_time;
-	//if (sum.w < eps) sum = vec4(0.0f, 0.0f, 0.0f, 0.0f);
-	imageStore(blur_map, px, max(vec4(0), sum));
+	sum -= decay * delta_time;
+	if (sum.w < eps) sum = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	imageStore(blur_map, px, sum);
 }

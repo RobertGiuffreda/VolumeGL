@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Window.h"
 
-Window::Window(int width, int height) : firstMouse(true), changed(true), px(0), py(0),
-										dx(0), dy(0), delta_time(0), last_frame(0)
+Window::Window(int height, int width) : enter(true), changed(true), cursor(false), px(0),
+										py(0), dx(0), dy(0), delta_time(0), last_frame(0)
 {
 	if (!glfwInit())
 	{
@@ -33,7 +33,6 @@ Window::Window(int width, int height) : firstMouse(true), changed(true), px(0), 
 
 	glfwSetFramebufferSizeCallback(handle, size_call);
 	glfwSetCursorPosCallback(handle, mouse_call);
-	/* Capture the mouse in the OpenGL window */
 	glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -48,45 +47,11 @@ Window::Window(int width, int height) : firstMouse(true), changed(true), px(0), 
 	perspective = glm::perspective(45.0f, (float)width / height, 0.1f, 1000.0f);
 }
 
-void Window::processMouseMovement()
-{
-	cam.ProcessMouseMovement(dx, dy);
-	dx = dy = 0.0f;
-}
+Window::~Window() {}
 
-void Window::processKeyboard(Camera_Movement direction)
+int Window::windowShouldClose()
 {
-	cam.ProcessKeyboard(direction, delta_time);
-}
-
-glm::mat4 Window::getViewMatrix()
-{
-	return cam.GetViewMatrix();
-}
-
-glm::mat4 Window::getPerspectiveMatrix()
-{
-	return perspective;
-}
-
-glm::vec3 Window::getCamPosition()
-{
-	return cam.pos;
-}
-
-void Window::setCamPosition(glm::vec3 position)
-{
-	cam.pos = position;
-}
-
-float Window::getDeltaTime()
-{
-	return delta_time;
-}
-
-glm::mat4 Window::calcMVP()
-{
-	return getPerspectiveMatrix() * getViewMatrix();
+	return glfwWindowShouldClose(handle);
 }
 
 void Window::start()
@@ -98,7 +63,7 @@ void Window::start()
 	process_input();
 
 	if (changed) {
-		processMouseMovement();
+		cam.ProcessMouseMovement(dx, dy);
 		changed = false;
 	}
 }
@@ -109,15 +74,46 @@ void Window::end()
 	glfwPollEvents();
 }
 
-int Window::windowShouldClose()
+GLFWwindow* Window::getWindowHandle()
 {
-	return glfwWindowShouldClose(handle);
+	return handle;
+}
+
+glm::vec3 Window::getCamPosition()
+{
+	return cam.pos;
+}
+
+float Window::getDeltaTime()
+{
+	return delta_time;
+}
+
+glm::mat4 Window::calcMVP()
+{
+	return perspective * cam.GetViewMatrix();
+}
+
+void Window::toggleCursor()
+{
+	if (cursor) {
+		cursor = false;
+		cam.Enable();
+		enter = true;
+		glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	} else {
+		cam.Disable();
+		cursor = true;
+		glfwSetInputMode(handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
 }
 
 void Window::process_input()
 {
-	if (glfwGetKey(handle, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(handle, true);
+	if (glfwGetKey(handle, GLFW_KEY_ESCAPE) == GLFW_PRESS && !cursor)
+		toggleCursor();
+	else if(glfwGetKey(handle, GLFW_KEY_ENTER) == GLFW_PRESS && cursor)
+		toggleCursor();
 	if (glfwGetKey(handle, GLFW_KEY_W) == GLFW_PRESS)
 		processKeyboard(Camera_Movement::FORWARD);
 	if (glfwGetKey(handle, GLFW_KEY_S) == GLFW_PRESS)
@@ -128,24 +124,27 @@ void Window::process_input()
 		processKeyboard(Camera_Movement::RIGHT);
 }
 
+void Window::processKeyboard(Camera_Movement direction)
+{
+	cam.ProcessKeyboard(direction, delta_time);
+}
+
 void Window::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	if (firstMouse)
+	if (enter)
 	{
 		px = xpos;
 		py = ypos;
-		firstMouse = false;
+		enter = false;
+		changed = false;
 	}
 
 	dx = xpos - px;
 	dy = py - ypos; // reversed since y-coordinates go from bottom to top
 
-	if (!changed)
-	{
-		px = xpos;
-		py = ypos;
-		changed = true;
-	}
+	px = xpos;
+	py = ypos;
+	changed = true;
 }
 
 void Window::size_callback(GLFWwindow* window, int width, int height)
