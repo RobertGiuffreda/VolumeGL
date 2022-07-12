@@ -7,7 +7,7 @@ struct particle
 	vec4 col;
 };
 
-layout(local_size_x = 16, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 layout(std430, binding = 0) buffer particles
 {
 	particle p[];
@@ -69,7 +69,7 @@ float Random(uint seed)
 void main()
 {
 	vec3 constants = vec3(0.0f, 1.0f, 0.5f);
-	uint gid = gl_GlobalInvocationID.x;
+	uint gid = gl_LocalInvocationIndex + 1024 * (gl_WorkGroupID.x + gl_WorkGroupID.y * 16 + gl_WorkGroupID.z * 256);
 
 	float rr = p[gid].pos.x * gid + p[gid].pos.y * time + p[gid].pos.z * dim.x + 1.0f;
 	uint ru = uint(rr);

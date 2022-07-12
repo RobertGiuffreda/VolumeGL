@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Simulation.h"
 
 Simulation::Simulation(Simulation_Settings s) : 
@@ -14,6 +15,28 @@ Simulation::Simulation(Simulation_Settings s) :
 	particle_shader("res/shaders/particle.vert", "res/shaders/particle.frag"),
 	dt(true)
 {
+	int work_grp_cnt[3];
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_grp_cnt[0]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &work_grp_cnt[1]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &work_grp_cnt[2]);
+	std::cout << "Max work groups per compute shader" << std::endl <<
+		"x: " << work_grp_cnt[0] << std::endl <<
+		"y: " << work_grp_cnt[1] << std::endl <<
+		"z: " << work_grp_cnt[2] << std::endl;
+
+	int work_grp_size[3];
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &work_grp_size[0]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &work_grp_size[1]);
+	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &work_grp_size[2]);
+	std::cout << "Max work group sizes" << std::endl << 
+		"x: " << work_grp_size[0] << std::endl <<
+		"y: " << work_grp_size[1] << std::endl <<
+		"z: " << work_grp_size[2] << std::endl;
+
+	int work_grp_inv;
+	glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &work_grp_inv);
+	std::cout << "Max invocations count per work group: " << work_grp_inv << std::endl;
+
 	glGenBuffers(1, &ssbo_id);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_id);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(particle) * s.pnum, (void*)&particles.get_particles()[0], GL_DYNAMIC_COPY);
@@ -56,11 +79,11 @@ void Simulation::run()
 		process_compute.SetUniform1f("delta_time", window.getDeltaTime());
 		//process_compute.SetUniform1f("delta_time", 0.7f);
 		process_compute.SetUniformVec3("dim", settings.dimensions);
-		glDispatchCompute(settings.dimensions.x, settings.dimensions.y, settings.dimensions.z);
+		glDispatchCompute(settings.dimensions.x/8, settings.dimensions.y/8, settings.dimensions.z/8);
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		copy_compute.Bind();
-		glDispatchCompute(settings.dimensions.x, settings.dimensions.y, settings.dimensions.z);
+		glDispatchCompute(settings.dimensions.x/8, settings.dimensions.y/8, settings.dimensions.z/8);
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		particle_compute.Bind();
@@ -72,7 +95,7 @@ void Simulation::run()
 		particle_compute.SetUniform1f("sensor_dist", settings.sensor_distance);
 		particle_compute.SetUniform1f("move_dist", settings.move_distance);
 
-		glDispatchCompute(settings.pnum, 1, 1);
+		glDispatchCompute(16, 16, 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		glm::vec3 camPos = window.getCamPosition();

@@ -23,7 +23,12 @@ const int XDIM = 64;
 const int YDIM = 64;
 const int ZDIM = 64;
 
-const int PNUM = 200000;
+const int PNUM = 262144;
+/* 
+262144 = 2^18
+sqrt(262144) = 512
+512/32 = 16
+*/
 
 const float move_dist = 1.0f;
 const float sensor_dist = 5.0f;
