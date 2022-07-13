@@ -15,13 +15,15 @@ layout(std430, binding = 0) buffer particles
 layout(rgba32f, binding = 1) uniform image3D trail_map;
 
 uniform vec3 dim;			// Dimensions of texture
-uniform float time;			// Current glfw time
-uniform float delta_time;
 uniform int sample_num;
 uniform float sensor_dist;
 uniform float turn_speed;
 uniform float move_dist;
-uniform float repulsion;
+uniform float deposit;
+
+uniform float time;			// Current glfw time
+uniform float delta_time;
+
 
 /* Gaussian noise texture Two channels */
 uniform sampler2D noise;
@@ -93,7 +95,7 @@ void main()
 	int i; vec3 rand;
 	for (i = 0; i < sample_num; i++)
 	{
-		rand = vec3(normalize(vec2(Random(ru + i), Random(hash(ru + i))) - 0.5f), 0.5f);
+		rand = vec3(normalize(vec2(Random(ru + i), Random(hash(ru + i))) - 0.5f), 1.0f);
 		vec3 world_rand = ltw * normalize(rand);	// Move to world coords from local coords
 
 		/* Get the coord for the pixel by adding the random
@@ -146,6 +148,10 @@ void main()
 		n_pos.y = min(dim.y - 0.01f, max(n_pos.y, 0.0f));
 		n_pos.z = min(dim.z - 0.01f, max(n_pos.z, 0.0f));
 		p[gid].dir.xyz = normalize(hash31(rr) - 0.5);
+	} else {
+		ivec3 px = ivec3(n_pos);
+		vec4 old = imageLoad(trail_map, px);
+		imageStore(trail_map, px, min(vec4(1.0f), old + p[gid].col * deposit * delta_time));
 	}
 
 	//vec3 bound = dim * 0.5f;
@@ -156,8 +162,4 @@ void main()
 	//}
 
 	p[gid].pos.xyz = n_pos;
-
-	ivec3 px = ivec3(p[gid].pos.xyz);
-	//imageStore(trail_map, px, p[gid].col);
-	imageStore(trail_map, px, mix(imageLoad(trail_map, px), p[gid].col, delta_time));
 }

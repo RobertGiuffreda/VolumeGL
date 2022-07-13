@@ -19,9 +19,9 @@ const unsigned int NOISE_W = 1080;
 const unsigned int NOISE_H = 1080;
 
 //volume dimensions
-const int XDIM = 64;
-const int YDIM = 64;
-const int ZDIM = 64;
+const int XDIM = 128;
+const int YDIM = 128;
+const int ZDIM = 128;
 
 const int PNUM = 262144;
 /* 
@@ -34,9 +34,10 @@ const float move_dist = 1.0f;
 const float sensor_dist = 5.0f;
 const int sample_num = 20.0;
 const float turn_speed = 0.5f;
+const float deposit = 1.0f;
 
-const float decay = 0.05f;
-const float blur_factor = 0.3f;
+const float decay = 0.8f;
+const float blur = 1.0f;
 
 int main(void)
 {
@@ -45,16 +46,19 @@ int main(void)
 		glm::vec3(XDIM, YDIM, ZDIM),
 
 		PNUM,
-		Layout::CUBE,
+		Layout::CENTER,
 		Direction::RANDOM,
 
 		move_dist,
 		sensor_dist,
 		sample_num,
 		turn_speed,
+		deposit,
 
 		decay,
-		blur_factor
+		blur,
+
+		false
 	};
 
 	Simulation sim(s);

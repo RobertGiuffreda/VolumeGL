@@ -24,9 +24,12 @@ struct Simulation_Settings {
 	float sensor_distance;
 	int sample_num;
 	float turn_speed;
+	float deposit;
 
 	float decay;
 	float blur;
+
+	bool dt;
 };
 
 class Simulation {

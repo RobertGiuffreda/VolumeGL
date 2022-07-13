@@ -9,7 +9,7 @@ uniform float blur;
 uniform float delta_time;
 uniform vec3 dim;
 
-float eps = 0.0001f;
+float eps = 0.00001f;
 
 void main()
 {
@@ -28,42 +28,41 @@ void main()
 	//sum *= 1.0f / (1. + 26. * blur);
 
 	/* 3D Gaussian Kernel */
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), max(0, px.y - 1), max(0, px.z - 1)));
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), max(0, px.y - 1), px.z)) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), max(0, px.y - 1), min(dim.z - 1, px.z + 1)));
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), px.y, max(0, px.z - 1))) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), px.y, px.z)) * 4.0f;
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), px.y, min(dim.z - 1, px.z + 1))) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), min(dim.y - 1, px.y + 1), max(0, px.z - 1)));	
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), min(dim.y - 1, px.y + 1), px.z)) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), min(dim.y - 1, px.y + 1), min(dim.z - 1, px.z + 1)));
+	// sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), max(0, px.y - 1), max(0, px.z - 1)));
+	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), max(0, px.y - 1), px.z));
+	// sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), max(0, px.y - 1), min(dim.z - 1, px.z + 1)));
+	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), px.y, max(0, px.z - 1)));
+	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), px.y, px.z)) * 2.0f;
+	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), px.y, min(dim.z - 1, px.z + 1)));
+	//sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), min(dim.y - 1, px.y + 1), max(0, px.z - 1)));	
+	sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), min(dim.y - 1, px.y + 1), px.z));
+	//sum += imageLoad(trail_map, ivec3(max(0, px.x - 1), min(dim.y - 1, px.y + 1), min(dim.z - 1, px.z + 1)));
 
-	sum += imageLoad(trail_map, ivec3(px.x, max(0, px.y - 1), max(0, px.z - 1))) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(px.x, max(0, px.y - 1), px.z)) * 4.0f;
-	sum += imageLoad(trail_map, ivec3(px.x, max(0, px.y - 1), min(dim.z - 1, px.z + 1))) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(px.x, px.y, max(0, px.z - 1))) * 4.0f;
-	sum += imageLoad(trail_map, ivec3(px.x, px.y, px.z)) * 8.0f;
-	sum += imageLoad(trail_map, ivec3(px.x, px.y, min(dim.z - 1, px.z + 1))) * 4.0f;
-	sum += imageLoad(trail_map, ivec3(px.x, min(dim.y - 1, px.y + 1), max(0, px.z - 1))) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(px.x, min(dim.y - 1, px.y + 1), px.z)) * 4.0f;
-	sum += imageLoad(trail_map, ivec3(px.x, min(dim.y - 1, px.y + 1), min(dim.z - 1, px.z + 1))) * 2.0f;
+	sum += imageLoad(trail_map, ivec3(px.x, max(0, px.y - 1), max(0, px.z - 1)));
+	sum += imageLoad(trail_map, ivec3(px.x, max(0, px.y - 1), px.z)) * 2.0f;
+	sum += imageLoad(trail_map, ivec3(px.x, max(0, px.y - 1), min(dim.z - 1, px.z + 1)));
+	sum += imageLoad(trail_map, ivec3(px.x, px.y, max(0, px.z - 1))) * 2.0f;
+	sum += imageLoad(trail_map, ivec3(px.x, px.y, px.z)) * 4.0f;
+	sum += imageLoad(trail_map, ivec3(px.x, px.y, min(dim.z - 1, px.z + 1))) * 2.0f;
+	sum += imageLoad(trail_map, ivec3(px.x, min(dim.y - 1, px.y + 1), max(0, px.z - 1)));
+	sum += imageLoad(trail_map, ivec3(px.x, min(dim.y - 1, px.y + 1), px.z)) * 2.0f;
+	sum += imageLoad(trail_map, ivec3(px.x, min(dim.y - 1, px.y + 1), min(dim.z - 1, px.z + 1)));
 
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), max(0, px.y - 1), max(0, px.z - 1)));
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), max(0, px.y - 1), px.z)) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), max(0, px.y - 1), min(dim.z - 1, px.z + 1)));
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), px.y, max(0, px.z - 1))) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), px.y, px.z)) * 4.0f;
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), px.y, min(dim.z - 1, px.z + 1))) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), min(dim.y - 1, px.y + 1), max(0, px.z - 1)));
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), min(dim.y - 1, px.y + 1), px.z)) * 2.0f;
-	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), min(dim.y - 1, px.y + 1), min(dim.z - 1, px.z + 1)));
+	//sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), max(0, px.y - 1), max(0, px.z - 1)));
+	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), max(0, px.y - 1), px.z));
+	//sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), max(0, px.y - 1), min(dim.z - 1, px.z + 1)));
+	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), px.y, max(0, px.z - 1)));
+	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), px.y, px.z)) * 2.0f;
+	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), px.y, min(dim.z - 1, px.z + 1)));
+	//sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), min(dim.y - 1, px.y + 1), max(0, px.z - 1)));
+	sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), min(dim.y - 1, px.y + 1), px.z));
+	//sum += imageLoad(trail_map, ivec3(min(dim.x - 1, px.x + 1), min(dim.y - 1, px.y + 1), min(dim.z - 1, px.z + 1)));
 
-	sum /= 64.0f;
+	sum /= 28.0f;
 
-	float blur_weight = blur * delta_time;
-	sum = mix(imageLoad(trail_map, px), sum, blur_weight);
-
-	sum -= decay * delta_time;
+	sum = mix(imageLoad(trail_map, px), sum, blur * delta_time);
+	sum = mix(sum, sum * decay, delta_time);
 	if (sum.w < eps) sum = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
 	imageStore(blur_map, px, sum);
 }

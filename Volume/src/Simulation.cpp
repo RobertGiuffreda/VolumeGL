@@ -13,7 +13,7 @@ Simulation::Simulation(Simulation_Settings s) :
 	copy_compute("res/shaders/copy.shader"),
 	zero_compute("res/shaders/whiteblock.shader"),
 	particle_shader("res/shaders/particle.vert", "res/shaders/particle.frag"),
-	dt(true)
+	dt(s.dt)
 {
 	int work_grp_cnt[3];
 	glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &work_grp_cnt[0]);
@@ -73,30 +73,34 @@ void Simulation::run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		process_compute.Bind();
-		process_compute.SetUniform1f("decay", settings.decay);
-		process_compute.SetUniform1f("blur", settings.blur);
-		process_compute.SetUniform1f("delta_time", window.getDeltaTime());
-		//process_compute.SetUniform1f("delta_time", 0.7f);
-		process_compute.SetUniformVec3("dim", settings.dimensions);
-		glDispatchCompute(settings.dimensions.x/8, settings.dimensions.y/8, settings.dimensions.z/8);
-		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
-		copy_compute.Bind();
-		glDispatchCompute(settings.dimensions.x/8, settings.dimensions.y/8, settings.dimensions.z/8);
-		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
 		particle_compute.Bind();
 		particle_compute.SetUniformVec3("dim", settings.dimensions);
-		particle_compute.SetUniform1f("time", glfwGetTime());
-		particle_compute.SetUniform1f("delta_time", (dt) ? window.getDeltaTime() : 0.9f);
-		particle_compute.SetUniform1f("turn_speed", settings.turn_speed);
-		particle_compute.SetUniform1i("sample_num", settings.sample_num);
-		particle_compute.SetUniform1f("sensor_dist", settings.sensor_distance);
+
 		particle_compute.SetUniform1f("move_dist", settings.move_distance);
+		particle_compute.SetUniform1f("sensor_dist", settings.sensor_distance);
+		particle_compute.SetUniform1i("sample_num", settings.sample_num);
+		particle_compute.SetUniform1f("turn_speed", settings.turn_speed);
+		particle_compute.SetUniform1f("sensor_dist", settings.sensor_distance);
+		particle_compute.SetUniform1f("deposit", settings.deposit);
+
+		particle_compute.SetUniform1f("time", glfwGetTime());
+		particle_compute.SetUniform1f("delta_time", (dt) ? window.getDeltaTime() : 1.0f);
 
 		glDispatchCompute(16, 16, 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+		process_compute.Bind();
+		process_compute.SetUniformVec3("dim", settings.dimensions);
+		process_compute.SetUniform1f("decay", settings.decay);
+		process_compute.SetUniform1f("blur", settings.blur);
+		process_compute.SetUniform1f("delta_time", (dt) ? window.getDeltaTime() : 1.0f);
+
+		glDispatchCompute(settings.dimensions.x / 8, settings.dimensions.y / 8, settings.dimensions.z / 8);
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+		copy_compute.Bind();
+		glDispatchCompute(settings.dimensions.x / 8, settings.dimensions.y / 8, settings.dimensions.z / 8);
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		glm::vec3 camPos = window.getCamPosition();
 		glm::mat4 MVP = window.calcMVP();
@@ -121,6 +125,7 @@ void Simulation::run()
 		ImGui::SliderFloat("Turn Speed", &(settings.turn_speed), 0.0f, 2.0f);
 		ImGui::SliderFloat("Decay", &(settings.decay), 0.0f, 1.0f);
 		ImGui::SliderFloat("Blur", &(settings.blur), 0.0f, 1.0f);
+		ImGui::SliderFloat("Deposit", &(settings.deposit), 0.0f, 5.0f);
 		ImGui::End();
 
 		ImGui::Render();
