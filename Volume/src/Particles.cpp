@@ -1,6 +1,6 @@
 #include "Particles.h"
 
-Particles::Particles(glm::vec3 dim, size_t p_num, Layout distribution, Direction direction) : p_num(p_num)
+Particles::Particles(glm::vec3 dim, size_t p_num, size_t g_num, Layout distribution, Direction direction) : p_num(p_num), g_num(g_num)
 {
 	glm::vec4 center = glm::vec4(dim, 0.0f) * 0.5f;
 	particles.resize(p_num);
@@ -43,7 +43,8 @@ Particles::Particles(glm::vec3 dim, size_t p_num, Layout distribution, Direction
 		}
 
 		/* Particle Color */
-		particles[i].color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		particles[i].mask = glm::vec4((i % g_num) == 0, (i % g_num) == 1, (i % g_num) == 2, 1.0f);
+		//particles[i].mask = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 	}
 }
 

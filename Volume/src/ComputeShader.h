@@ -18,4 +18,5 @@ public:
 	void SetUniform1f(const std::string& name, float value);
 	void SetUniform1ui(const std::string& name, unsigned int value);
 	void SetUniformVec3(const std::string& name, glm::vec3 vec);
+	void SetUniformVec4(const std::string& name, glm::vec4 vec);
 };

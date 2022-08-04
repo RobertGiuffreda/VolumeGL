@@ -4,7 +4,7 @@ struct particle
 {
 	vec4 pos;
 	vec4 dir;
-	vec4 col;
+	vec4 mask;
 };
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
@@ -73,6 +73,9 @@ void main()
 	vec3 constants = vec3(0.0f, 1.0f, 0.5f);
 	uint gid = gl_LocalInvocationIndex + 1024 * (gl_WorkGroupID.x + gl_WorkGroupID.y * 16 + gl_WorkGroupID.z * 256);
 
+	//vec4 sense_mask = p[gid].mask;
+	vec4 sense_mask = (2.0f * p[gid].mask) - vec4(1.0f);
+
 	float rr = p[gid].pos.x * gid + p[gid].pos.y * time + p[gid].pos.z * dim.x + 1.0f;
 	uint ru = uint(rr);
 
@@ -91,7 +94,7 @@ void main()
 	/* Sample many points ahead of particle and take the direction
 	with the largest value in the loop below. */
 	vec3 max_dir = constants.xxy;
-	float max_val = imageLoad(trail_map, ivec3(p[gid].pos.xyz + sensor_dist * w)).w;
+	float max_val = dot(sense_mask, imageLoad(trail_map, ivec3(p[gid].pos.xyz + sensor_dist * w)));
 	int i; vec3 rand;
 	for (i = 0; i < sample_num; i++)
 	{
@@ -104,7 +107,7 @@ void main()
 		Then use the alpha channel value in the texture at the coords
 		to test if the new direction should be chosen with max */
 		ivec3 tmp_px = ivec3(p[gid].pos.xyz + sensor_dist * world_rand);
-		float tmp_val = imageLoad(trail_map, tmp_px).w;
+		float tmp_val = dot(sense_mask, imageLoad(trail_map, tmp_px));
 		if (tmp_val > max_val)
 		{
 			max_val = tmp_val;
@@ -151,7 +154,7 @@ void main()
 	} else {
 		ivec3 px = ivec3(n_pos);
 		vec4 old = imageLoad(trail_map, px);
-		imageStore(trail_map, px, min(vec4(1.0f), old + p[gid].col * deposit * delta_time));
+		imageStore(trail_map, px, min(vec4(1.0f), old + p[gid].mask * deposit * delta_time));
 	}
 
 	//vec3 bound = dim * 0.5f;

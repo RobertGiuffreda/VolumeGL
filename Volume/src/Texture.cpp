@@ -17,7 +17,7 @@ Texture::Texture(int w, int h, int l, int slot, int base) : id(0)
 Texture::Texture(int w, int h, int slot, int base) : id(0)
 {
 	glGenTextures(1, &id);
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);

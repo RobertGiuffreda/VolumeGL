@@ -3,15 +3,17 @@
 
 Simulation::Simulation(Simulation_Settings s) : 
 	window(s.window_dim.x, s.window_dim.y),
-	particles(s.dimensions, s.pnum, s.distribution, s.direction),
+	particles(s.dimensions, s.pnum, s.group_num, s.distribution, s.direction),
 	initial_texture(s.dimensions.x, s.dimensions.y, s.dimensions.z, 1, 1),
 	processed_texture(s.dimensions.x, s.dimensions.y, s.dimensions.z, 2, 2),
+	display_texture(s.dimensions.x, s.dimensions.y, s.dimensions.z, 3, 3),
 	full_tex(0),
-	marcher(1, glm::vec3(1./ s.dimensions.x, 1./ s.dimensions.y, 1./ s.dimensions.z)),
+	marcher(3, glm::vec3(1./ s.dimensions.x, 1./ s.dimensions.y, 1./ s.dimensions.z)),
 	particle_compute("res/shaders/p_update.shader"),
 	process_compute("res/shaders/blur_trail.shader"),
 	copy_compute("res/shaders/copy.shader"),
 	zero_compute("res/shaders/whiteblock.shader"),
+	color_compute("res/shaders/color.shader"),
 	particle_shader("res/shaders/particle.vert", "res/shaders/particle.frag"),
 	dt(s.dt)
 {
@@ -41,6 +43,26 @@ Simulation::Simulation(Simulation_Settings s) :
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo_id);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(particle) * s.pnum, (void*)&particles.get_particles()[0], GL_DYNAMIC_COPY);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo_id);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+	/* Tempryary group settings code/struct */
+
+	struct group_settings {
+		glm::vec4 color;
+	};
+
+	std::vector<group_settings> gs;
+	gs.resize(s.group_num);
+	for (int i = 0; i < s.group_num; ++i)
+		gs[i].color = glm::vec4(i == 0, i == 1, i == 2, 1.0f);
+
+	for (int i = 0; i < s.group_num; ++i)
+		std::cout << "r: " << gs[i].color.r << "  g: " << gs[i].color.g << "  b: " << gs[i].color.b << "  a: " << gs[i].color.a << std::endl;
+
+	glGenBuffers(1, &settings_ssbo);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, settings_ssbo);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(struct group_settings) * s.group_num, (void*)&gs[0], GL_DYNAMIC_COPY);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, settings_ssbo);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	settings = s;
@@ -94,11 +116,15 @@ void Simulation::run()
 		process_compute.SetUniform1f("decay", settings.decay);
 		process_compute.SetUniform1f("blur", settings.blur);
 		process_compute.SetUniform1f("delta_time", (dt) ? window.getDeltaTime() : 1.0f);
-
 		glDispatchCompute(settings.dimensions.x / 8, settings.dimensions.y / 8, settings.dimensions.z / 8);
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		copy_compute.Bind();
+		glDispatchCompute(settings.dimensions.x / 8, settings.dimensions.y / 8, settings.dimensions.z / 8);
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+
+		color_compute.Bind();
+		color_compute.SetUniform1i("group_num", settings.group_num);
 		glDispatchCompute(settings.dimensions.x / 8, settings.dimensions.y / 8, settings.dimensions.z / 8);
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 

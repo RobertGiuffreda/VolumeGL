@@ -17,12 +17,13 @@ struct Simulation_Settings {
 	glm::vec3 dimensions;
 
 	size_t pnum;
+	int group_num;
 	Layout distribution;
 	Direction direction;
 
+	int sample_num;
 	float move_distance;
 	float sensor_distance;
-	int sample_num;
 	float turn_speed;
 	float deposit;
 
@@ -42,6 +43,7 @@ public:
 
 	Texture initial_texture;
 	Texture processed_texture;
+	Texture display_texture;
 
 	FullScreenTexture full_tex;
 	Marcher marcher;
@@ -50,6 +52,7 @@ public:
 	ComputeShader process_compute;
 	ComputeShader copy_compute;
 	ComputeShader zero_compute;
+	ComputeShader color_compute;
 
 	Shader particle_shader;
 
@@ -59,6 +62,7 @@ public:
 	void run();
 private:
 	unsigned int ssbo_id;
+	unsigned int settings_ssbo;
 	Simulation_Settings settings;
 	bool dt;
 };

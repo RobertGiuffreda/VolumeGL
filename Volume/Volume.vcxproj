@@ -188,6 +188,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\blur_trail.shader" />
+    <None Include="res\shaders\color.shader" />
     <None Include="res\shaders\copy.shader" />
     <None Include="res\shaders\fragment.shader" />
     <None Include="res\shaders\marcherfrag.shader" />
