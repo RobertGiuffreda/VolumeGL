@@ -2,12 +2,13 @@
 
 #include <glm.hpp>
 #include <vector>
+#include <iostream>
 #include "Random.h"
 
 struct particle {
 	glm::vec4 position;
 	glm::vec4 direction;
-	glm::vec4 color;
+	glm::vec4 mask;
 };
 
 enum class Layout
@@ -27,9 +28,10 @@ enum class Direction
 
 class Particles {
 public:
-	Particles(glm::vec3 dim, size_t p_num, Layout distribution, Direction direction);
+	Particles(glm::vec3 dim, size_t p_num, size_t g_num, Layout distribution, Direction direction);
 	std::vector<particle> get_particles();
 private:
 	size_t p_num;
+	size_t g_num;
 	std::vector<particle> particles;
 };

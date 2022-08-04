@@ -143,5 +143,6 @@
     <None Include="res\shaders\particle.frag" />
     <None Include="res\shaders\vertex.shader" />
     <None Include="res\shaders\fragment.shader" />
+    <None Include="res\shaders\color.shader" />
   </ItemGroup>
 </Project>

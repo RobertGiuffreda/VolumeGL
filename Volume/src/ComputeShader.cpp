@@ -68,6 +68,11 @@ void ComputeShader::SetUniformVec3(const std::string& name, glm::vec3 vec)
     glUniform3fv(GetUniformLocation(name), 1, &vec[0]);
 }
 
+void ComputeShader::SetUniformVec4(const std::string& name, glm::vec4 vec)
+{
+    glUniform4fv(GetUniformLocation(name), 1, &vec[0]);
+}
+
 int ComputeShader::GetUniformLocation(const std::string& name)
 {
     int location = glGetUniformLocation(id, name.c_str());
