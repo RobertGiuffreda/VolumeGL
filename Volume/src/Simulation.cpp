@@ -108,7 +108,7 @@ void Simulation::run()
 		particle_compute.SetUniform1f("time", glfwGetTime());
 		particle_compute.SetUniform1f("delta_time", (dt) ? window.getDeltaTime() : 1.0f);
 
-		glDispatchCompute(16, 16, 1);
+		glDispatchCompute(settings.pnum/1024, 1, 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 		process_compute.Bind();
@@ -145,10 +145,10 @@ void Simulation::run()
 		// ImGui
 		ImGui::Begin("Hello.");
 		ImGui::Text("Banano is it. It's nice to meet a man such as yourself!");
-		ImGui::SliderFloat("Speed", &(settings.move_distance), 0.0f, 5.0f);
-		ImGui::SliderFloat("Sensor Range", &(settings.sensor_distance), 3.0f, 10.0f);
+		ImGui::SliderFloat("Speed", &(settings.move_distance), 0.0f, 10.0f);
+		ImGui::SliderFloat("Sensor Range", &(settings.sensor_distance), 0.0f, 10.0f);
 		ImGui::Checkbox("Delta Time", &dt);
-		ImGui::SliderFloat("Turn Speed", &(settings.turn_speed), 0.0f, 2.0f);
+		ImGui::SliderFloat("Turn Speed", &(settings.turn_speed), -3.0f, 3.0f);
 		ImGui::SliderFloat("Decay", &(settings.decay), 0.0f, 1.0f);
 		ImGui::SliderFloat("Blur", &(settings.blur), 0.0f, 1.0f);
 		ImGui::SliderFloat("Deposit", &(settings.deposit), 0.0f, 5.0f);

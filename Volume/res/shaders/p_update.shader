@@ -145,24 +145,28 @@ void main()
 	/* The position of the bounds in world space need
 	to be between zero and dim values to line up with
 	the 3D Texture coords. Won't have box at origin. */
-	if (n_pos.x < 0.0f || n_pos.x >= dim.x || n_pos.y < 0.0f || n_pos.y >= dim.y || n_pos.z < 0.0f || n_pos.z >= dim.z)
+	//if (n_pos.x < 0.0f || n_pos.x >= dim.x || n_pos.y < 0.0f || n_pos.y >= dim.y || n_pos.z < 0.0f || n_pos.z >= dim.z)
+	//{
+	//	n_pos.x = min(dim.x - 0.01f, max(n_pos.x, 0.0f));
+	//	n_pos.y = min(dim.y - 0.01f, max(n_pos.y, 0.0f));
+	//	n_pos.z = min(dim.z - 0.01f, max(n_pos.z, 0.0f));
+	//	p[gid].dir.xyz = normalize(hash31(rr) - 0.5);
+	//} else {
+	//	ivec3 px = ivec3(n_pos);
+	//	vec4 old = imageLoad(trail_map, px);
+	//	imageStore(trail_map, px, min(vec4(1.0f), old + p[gid].mask * deposit * delta_time));
+	//}
+
+	vec3 bound = dim * 0.5f;
+	if (length(n_pos - bound) > bound.x)
 	{
-		n_pos.x = min(dim.x - 0.01f, max(n_pos.x, 0.0f));
-		n_pos.y = min(dim.y - 0.01f, max(n_pos.y, 0.0f));
-		n_pos.z = min(dim.z - 0.01f, max(n_pos.z, 0.0f));
+		n_pos = bound + normalize(n_pos - bound) * bound.x;
 		p[gid].dir.xyz = normalize(hash31(rr) - 0.5);
 	} else {
 		ivec3 px = ivec3(n_pos);
 		vec4 old = imageLoad(trail_map, px);
 		imageStore(trail_map, px, min(vec4(1.0f), old + p[gid].mask * deposit * delta_time));
 	}
-
-	//vec3 bound = dim * 0.5f;
-	//if (length(n_pos - bound) > bound.x)
-	//{
-	//	n_pos = bound + normalize(n_pos - bound) * bound.x;
-	//	p[gid].dir.xyz = normalize(hash31(rr) - 0.5);
-	//}
 
 	p[gid].pos.xyz = n_pos;
 }

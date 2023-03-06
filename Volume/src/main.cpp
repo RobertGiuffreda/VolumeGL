@@ -23,8 +23,9 @@ const int XDIM = 128;
 const int YDIM = 128;
 const int ZDIM = 128;
 
-const int PNUM = 262144;
-const int group_num = 1;
+const int PNUM = 2097152;
+const int group_num = 3;
+
 /* 
 262144 = 2^18
 sqrt(262144) = 512
